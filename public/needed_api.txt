@@ -1,0 +1,185 @@
+// Register User
+POST /auth/register
+Body: {
+  name: string,
+  email: string,
+  password: string
+}
+Response: {
+  token: string,
+  user: {
+    id: string,
+    name: string,
+    email: string,
+    createdAt: string
+    isAdmin:boolean
+  }
+}
+
+// Login
+POST /auth/login
+Body: {
+  email: string,
+  password: string
+}
+Response: {
+  token: string,
+  user: {
+    id: string,
+    name: string,
+    email: string
+  }
+}
+
+/*
+COURSES ENDPOINTS
+*/
+
+// Get All Courses
+GET /courses
+Query: {
+  category?: string,
+  level?: string,
+  search?: string,
+  enrolled?: boolean
+}
+Response: {
+  courses: [{
+    id: string,
+    title: string,
+    description: string,
+    duration: string,
+    category: string,
+    level: string,
+    enrolled: boolean,
+    rating: number,
+    image: string,
+    progress: number
+  }]
+}
+
+// Get Course Details
+GET /courses/{courseId}
+Response: {
+  id: string,
+  title: string,
+  description: string,
+  instructor: {
+    id: string,
+    name: string
+  },
+  category: string,
+  level: string,
+  duration: string,
+  rating: number,
+  enrollmentDate: string,
+  image: string,
+  progress: number,
+  sections: [{
+    id: string,
+    title: string,
+    completed: boolean,
+    duration: string,
+    modules: [{
+      id: string,
+      type: "video|quiz|reading",
+      title: string,
+      duration: string,
+      completed: boolean,
+      score: number,
+      questions: number,
+      pages: number
+    }]
+  }]
+}
+
+// Enroll in Course
+POST /courses/{courseId}/enroll
+Response: {
+  success: boolean,
+  enrollmentId: string,
+  enrollmentDate: string
+}
+
+// Update Module Progress
+PUT /courses/{courseId}/modules/{moduleId}/progress
+Body: {
+  completed: boolean,
+  score?: number  // Optional, for quizzes
+}
+Response: {
+  success: boolean,
+  courseProgress: number
+}
+
+/*
+USER PROGRESS ENDPOINTS
+*/
+
+// Get User Activity
+GET /users/activity
+Query: {
+  startDate?: string,
+  endDate?: string
+}
+Response: {
+  activity: [{
+    day: string,
+    hours: number
+  }]
+}
+
+/*
+COURSE ASSISTANT (CHAT) ENDPOINTS
+*/
+
+// Send Message
+POST /courses/{courseId}/chat
+Body: {
+  message: string
+}
+Response: {
+  response: {
+    sender: "ai",
+    message: string,
+    timestamp: string
+  }
+}
+
+// Get Chat History
+GET /courses/{courseId}/chat
+Response: {
+  messages: [{
+    sender: string,
+    message: string,
+    timestamp: string
+  }]
+}
+
+/*
+ERROR RESPONSES
+*/
+
+// 400 Bad Request
+{
+  error: "string",
+  message: "string"
+}
+
+// 401 Unauthorized
+{
+  error: "Unauthorized",
+  message: "Invalid or expired token"
+}
+
+// 404 Not Found
+{
+  error: "Not Found",
+  message: "Resource not found"
+}
+
+// 500 Internal Server Error
+{
+  error: "Internal Server Error",
+  message: "An unexpected error occurred"
+}
