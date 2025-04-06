@@ -189,187 +189,181 @@ const Courses = () => {
   const availableCourses = filteredCourses.filter((course) => !course.enrolled);
 
   return (
-    <>
-      <Navbar />
-      <PageTransition>
-        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-20 pb-12 px-4 sm:px-6">
-          <div className="max-w-7xl mx-auto">
-            {/* Header */}
-            <div className="mb-8">
-              <h1
-                className={`text-3xl font-bold text-slate-900 dark:text-white mb-2 opacity-0 ${
-                  isLoaded ? "animate-slide-down" : ""
-                }`}
-                style={{ animationDelay: "100ms" }}
-              >
-                Courses
-              </h1>
-              <p
-                className={`text-slate-600 dark:text-slate-400 opacity-0 ${
-                  isLoaded ? "animate-slide-down" : ""
-                }`}
-                style={{ animationDelay: "200ms" }}
-              >
-                Browse our collection of high-quality courses to enhance your
-                skills
-              </p>
-            </div>
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-20 pb-12 px-4 sm:px-6">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1
+            className={`text-3xl font-bold text-slate-900 dark:text-white mb-2 opacity-0 ${
+              isLoaded ? "animate-slide-down" : ""
+            }`}
+            style={{ animationDelay: "100ms" }}
+          >
+            Courses
+          </h1>
+          <p
+            className={`text-slate-600 dark:text-slate-400 opacity-0 ${
+              isLoaded ? "animate-slide-down" : ""
+            }`}
+            style={{ animationDelay: "200ms" }}
+          >
+            Browse our collection of high-quality courses to enhance your skills
+          </p>
+        </div>
 
-            {/* Search and filters */}
-            <div
-              className={`mb-8 opacity-0 ${isLoaded ? "animate-slide-up" : ""}`}
-              style={{ animationDelay: "300ms" }}
-            >
-              <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm p-4 border border-slate-200 dark:border-slate-800">
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-                  <div className="md:col-span-6 lg:col-span-5">
-                    <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-                      <Input
-                        type="text"
-                        placeholder="Search for courses..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="pl-10"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-3 lg:col-span-2">
-                    <div className="relative">
-                      <select
-                        value={selectedCategory}
-                        onChange={(e) => setSelectedCategory(e.target.value)}
-                        className="w-full h-10 pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        {categories.map((category) => (
-                          <option key={category} value={category}>
-                            {category}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4 pointer-events-none" />
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-3 lg:col-span-2">
-                    <div className="relative">
-                      <select
-                        value={selectedLevel}
-                        onChange={(e) => setSelectedLevel(e.target.value)}
-                        className="w-full h-10 pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      >
-                        {levels.map((level) => (
-                          <option key={level} value={level}>
-                            {level}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4 pointer-events-none" />
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-3">
-                    <Button
-                      className="w-full justify-between shadow-sm"
-                      variant="outline"
-                    >
-                      <Filter className="h-4 w-4 mr-2" /> More Filters
-                    </Button>
-                  </div>
+        {/* Search and filters */}
+        <div
+          className={`mb-8 opacity-0 ${isLoaded ? "animate-slide-up" : ""}`}
+          style={{ animationDelay: "300ms" }}
+        >
+          <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm p-4 border border-slate-200 dark:border-slate-800">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <div className="md:col-span-6 lg:col-span-5">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+                  <Input
+                    type="text"
+                    placeholder="Search for courses..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
                 </div>
               </div>
-            </div>
 
-            {/* Course listings */}
-            <div
-              className={`opacity-0 ${isLoaded ? "animate-slide-up" : ""}`}
-              style={{ animationDelay: "400ms" }}
-            >
-              <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-3 mb-6">
-                  <TabsTrigger value="all">All Courses</TabsTrigger>
-                  <TabsTrigger value="enrolled">My Courses</TabsTrigger>
-                  <TabsTrigger value="available">Available Courses</TabsTrigger>
-                </TabsList>
+              <div className="md:col-span-3 lg:col-span-2">
+                <div className="relative">
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="w-full h-10 pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {categories.map((category) => (
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4 pointer-events-none" />
+                </div>
+              </div>
 
-                <TabsContent value="all" className="space-y-6">
-                  {filteredCourses.length === 0 ? (
-                    <div className="text-center py-12">
-                      <BookOpen className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-                      <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
-                        No courses found
-                      </h3>
-                      <p className="text-slate-600 dark:text-slate-400">
-                        Try adjusting your search or filters
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {filteredCourses.map((course) => (
-                        <CourseCard
-                          key={course.id}
-                          course={course}
-                          onEnroll={handleEnroll}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </TabsContent>
+              <div className="md:col-span-3 lg:col-span-2">
+                <div className="relative">
+                  <select
+                    value={selectedLevel}
+                    onChange={(e) => setSelectedLevel(e.target.value)}
+                    className="w-full h-10 pl-3 pr-10 py-2 text-sm border border-slate-200 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {levels.map((level) => (
+                      <option key={level} value={level}>
+                        {level}
+                      </option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4 pointer-events-none" />
+                </div>
+              </div>
 
-                <TabsContent value="enrolled" className="space-y-6">
-                  {enrolledCourses.length === 0 ? (
-                    <div className="text-center py-12">
-                      <BookOpen className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-                      <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
-                        No enrolled courses
-                      </h3>
-                      <p className="text-slate-600 dark:text-slate-400">
-                        Browse available courses and enroll to start learning
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {enrolledCourses.map((course) => (
-                        <CourseCard
-                          key={course.id}
-                          course={course}
-                          onEnroll={handleEnroll}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </TabsContent>
-
-                <TabsContent value="available" className="space-y-6">
-                  {availableCourses.length === 0 ? (
-                    <div className="text-center py-12">
-                      <BookOpen className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-                      <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
-                        No available courses
-                      </h3>
-                      <p className="text-slate-600 dark:text-slate-400">
-                        Try adjusting your search or filters
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {availableCourses.map((course) => (
-                        <CourseCard
-                          key={course.id}
-                          course={course}
-                          onEnroll={handleEnroll}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </TabsContent>
-              </Tabs>
+              <div className="md:col-span-3">
+                <Button
+                  className="w-full justify-between shadow-sm"
+                  variant="outline"
+                >
+                  <Filter className="h-4 w-4 mr-2" /> More Filters
+                </Button>
+              </div>
             </div>
           </div>
         </div>
-      </PageTransition>
-    </>
+
+        {/* Course listings */}
+        <div
+          className={`opacity-0 ${isLoaded ? "animate-slide-up" : ""}`}
+          style={{ animationDelay: "400ms" }}
+        >
+          <Tabs defaultValue="all" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 mb-6">
+              <TabsTrigger value="all">All Courses</TabsTrigger>
+              <TabsTrigger value="enrolled">My Courses</TabsTrigger>
+              <TabsTrigger value="available">Available Courses</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="all" className="space-y-6">
+              {filteredCourses.length === 0 ? (
+                <div className="text-center py-12">
+                  <BookOpen className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
+                  <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
+                    No courses found
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    Try adjusting your search or filters
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredCourses.map((course) => (
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      onEnroll={handleEnroll}
+                    />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="enrolled" className="space-y-6">
+              {enrolledCourses.length === 0 ? (
+                <div className="text-center py-12">
+                  <BookOpen className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
+                  <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
+                    No enrolled courses
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    Browse available courses and enroll to start learning
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {enrolledCourses.map((course) => (
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      onEnroll={handleEnroll}
+                    />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="available" className="space-y-6">
+              {availableCourses.length === 0 ? (
+                <div className="text-center py-12">
+                  <BookOpen className="h-12 w-12 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
+                  <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
+                    No available courses
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-400">
+                    Try adjusting your search or filters
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {availableCourses.map((course) => (
+                    <CourseCard
+                      key={course.id}
+                      course={course}
+                      onEnroll={handleEnroll}
+                    />
+                  ))}
+                </div>
+              )}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </div>
   );
 };
 

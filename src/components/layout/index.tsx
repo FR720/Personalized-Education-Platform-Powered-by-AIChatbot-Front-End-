@@ -5,9 +5,12 @@ import PageTransition from "./PageTransition";
 
 const Layout = () => {
   return (
-    <PageTransition>
-      <Navbar /> <Outlet />
-    </PageTransition>
+    <>
+      <Navbar />
+      <PageTransition>
+        <Outlet />
+      </PageTransition>
+    </>
   );
 };
 

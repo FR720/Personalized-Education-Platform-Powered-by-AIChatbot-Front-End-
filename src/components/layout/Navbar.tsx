@@ -34,10 +34,10 @@ const Navbar: React.FC = () => {
         <Button
           variant="ghost"
           size="sm"
-          className="relative h-8 w-8 rounded-full"
+          className="relative p-1 rounded-full  "
         >
-          <div className="flex h-full w-full items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
-            <User className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+          <div className="flex  items-center justify-center rounded-full h-8 w-8 bg-slate-100 ">
+            <User className=" text-slate-600    " />
           </div>
         </Button>
       </DropdownMenuTrigger>
@@ -96,19 +96,6 @@ const Navbar: React.FC = () => {
         },
       ]
     : [{ name: "Home", path: "/", icon: null }];
-
-  const authLinks = isAuthenticated
-    ? [
-        {
-          // name: "Profile",
-          // path: "/profile",
-          icon: <UserDropdown />,
-        },
-      ]
-    : [
-        { name: "Sign In", path: "/signin", icon: null },
-        { name: "Sign Up", path: "/signup", icon: null, isPrimary: true },
-      ];
 
   return (
     <header
