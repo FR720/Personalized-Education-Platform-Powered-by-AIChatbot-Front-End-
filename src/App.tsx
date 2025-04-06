@@ -1,24 +1,23 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
+import { TooltipProvider } from "@/components/ui/tooltip";
+
+import CourseView from "./pages/CourseView";
+import Courses from "./pages/Courses";
+import Dashboard from "./pages/Dashboard";
 import Index from "./pages/Index";
+import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
-import Dashboard from "./pages/Dashboard";
-import Courses from "./pages/Courses";
-import CourseView from "./pages/CourseView";
-import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
+      <ToastContainer />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />

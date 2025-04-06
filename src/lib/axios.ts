@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
-const baseURL = import.meta.env.VITE_API_URL || "BASE_URL";
+const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export const axiosInstance = axios.create({
   baseURL,
@@ -31,7 +31,8 @@ axiosInstance.interceptors.response.use(
 
     switch (statusCode) {
       case 401:
-        // Handle unauthorized
+        toast.error("Unauthorized access. Please log in again.");
+
         localStorage.removeItem("token");
         window.location.href = "/login";
         break;
