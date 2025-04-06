@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useApiMutation } from "@/hooks/useMutuation";
 import useUserStore from "@/store/authStore";
+import withAuth from "@/lib/withAuth";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -53,18 +54,6 @@ const SignIn = () => {
       password,
     });
   };
-
-  // const handleSubmit = (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setLoading(true);
-
-  //   // Simulate authentication
-  //   setTimeout(() => {
-  //     console.log("Signing in with:", { email, password });
-  //     setLoading(false);
-  //     navigate("/dashboard");
-  //   }, 1500);
-  // };
 
   return (
     <>
@@ -204,4 +193,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default withAuth(SignIn);

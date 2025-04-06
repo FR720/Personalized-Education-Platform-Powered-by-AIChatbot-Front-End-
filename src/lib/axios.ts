@@ -13,9 +13,12 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const token = localStorage.getItem("user-storage");
+    const parsedStorage = JSON.parse(token || "{}");
+    const actualToken = parsedStorage.state?.token;
+    console.log("🚀 ~ actualToken:", actualToken);
+    if (actualToken) {
+      config.headers.Authorization = `Bearer ${actualToken}`;
     }
     return config;
   },
@@ -33,8 +36,8 @@ axiosInstance.interceptors.response.use(
       case 401:
         toast.error("Unauthorized access. Please log in again.");
 
-        localStorage.removeItem("token");
-        window.location.href = "/login";
+        localStorage.removeItem("user-storage");
+        // window.location.href = "/login";
         break;
       case 403:
         toast.error("Permission denied");

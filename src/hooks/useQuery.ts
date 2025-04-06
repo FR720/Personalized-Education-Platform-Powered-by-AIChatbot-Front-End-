@@ -9,7 +9,7 @@ interface QueryConfig<TData>
   params?: object;
 }
 
-export function useApiQuery<TData = unknown>({
+export function useApiQuery<TData = any>({
   url,
   params,
   ...config

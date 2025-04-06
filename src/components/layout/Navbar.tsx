@@ -1,51 +1,115 @@
+import React, { useEffect, useState } from "react";
 
-import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { BookOpen, LayoutDashboard, LogOut, Menu, User, X } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, BookOpen, LayoutDashboard } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
+import useUserStore from "@/store/authStore";
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
-  const isAuthenticated = false; // This would be replaced with actual auth state
-  
+
+  const navigate = useNavigate();
+
+  const { token: isAuthenticated, user, logOut } = useUserStore();
+
+  const handleLogout = () => {
+    logOut();
+    navigate("/signin");
+  };
+  const UserDropdown = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="relative h-8 w-8 rounded-full"
+        >
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+            <User className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+          </div>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        className="w-56"
+        align="end"
+        alignOffset={8}
+        forceMount
+      >
+        <DropdownMenuLabel className="font-normal">
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{user?.name}</p>
+            <p className="text-xs leading-none text-slate-500">{user?.email}</p>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          className="text-red-600 dark:text-red-400 cursor-pointer"
+          onClick={handleLogout}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Log out</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
-  
+
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
-    
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-  
+
   // Close mobile menu on route change
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
-  
+
   const navLinks = isAuthenticated
     ? [
-        { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard className="h-4 w-4 mr-1.5" /> },
-        { name: "Courses", path: "/courses", icon: <BookOpen className="h-4 w-4 mr-1.5" /> },
+        {
+          name: "Dashboard",
+          path: "/dashboard",
+          icon: <LayoutDashboard className="h-4 w-4 mr-1.5" />,
+        },
+        {
+          name: "Courses",
+          path: "/courses",
+          icon: <BookOpen className="h-4 w-4 mr-1.5" />,
+        },
       ]
-    : [
-        { name: "Home", path: "/", icon: null },
-      ];
-  
+    : [{ name: "Home", path: "/", icon: null }];
+
   const authLinks = isAuthenticated
     ? [
-        { name: "Profile", path: "/profile", icon: <User className="h-4 w-4 mr-1.5" /> },
+        {
+          // name: "Profile",
+          // path: "/profile",
+          icon: <UserDropdown />,
+        },
       ]
     : [
         { name: "Sign In", path: "/signin", icon: null },
         { name: "Sign Up", path: "/signup", icon: null, isPrimary: true },
       ];
-  
+
   return (
     <header
       className={cn(
@@ -57,8 +121,8 @@ const Navbar: React.FC = () => {
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Logo */}
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="text-2xl font-semibold bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600 flex items-center"
         >
           <div className="mr-2 relative">
@@ -69,7 +133,7 @@ const Navbar: React.FC = () => {
           </div>
           CourseNav
         </Link>
-        
+
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
           {navLinks.map((link) => (
@@ -87,24 +151,31 @@ const Navbar: React.FC = () => {
               {link.name}
             </Link>
           ))}
-          
+
           <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 mx-1"></div>
-          
-          {authLinks.map((link) => (
-            <Link key={link.path} to={link.path}>
-              {link.isPrimary ? (
+
+          {isAuthenticated ? (
+            <UserDropdown />
+          ) : (
+            <>
+              <Link to="/signin">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-slate-600 dark:text-slate-300"
+                >
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/signup">
                 <Button size="sm" className="ml-2 shadow-sm">
-                  {link.name}
+                  Sign Up
                 </Button>
-              ) : (
-                <Button size="sm" variant="ghost" className="text-slate-600 dark:text-slate-300">
-                  {link.name}
-                </Button>
-              )}
-            </Link>
-          ))}
+              </Link>
+            </>
+          )}
         </nav>
-        
+
         {/* Mobile menu button */}
         <button
           onClick={toggleMobileMenu}
@@ -118,13 +189,13 @@ const Navbar: React.FC = () => {
           )}
         </button>
       </div>
-      
+
       {/* Mobile Navigation */}
       <div
         className={cn(
           "md:hidden fixed inset-0 bg-white dark:bg-slate-900 z-40 transition-all duration-300 ease-in-out pt-20 px-6",
-          isMobileMenuOpen 
-            ? "opacity-100 translate-x-0" 
+          isMobileMenuOpen
+            ? "opacity-100 translate-x-0"
             : "opacity-0 translate-x-full pointer-events-none"
         )}
       >
@@ -144,24 +215,39 @@ const Navbar: React.FC = () => {
               {link.name}
             </Link>
           ))}
-          
+
           <div className="h-px w-full bg-slate-100 dark:bg-slate-800 my-2"></div>
-          
-          {authLinks.map((link) => (
-            <Link
-              key={link.path}
-              to={link.path}
-              className={cn(
-                "px-4 py-3 rounded-md text-base font-medium transition-all flex items-center",
-                link.isPrimary
-                  ? "bg-blue-600 text-white shadow-md hover:bg-blue-700"
-                  : "text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
-              )}
-            >
-              {link.icon}
-              {link.name}
-            </Link>
-          ))}
+
+          {isAuthenticated ? (
+            <>
+              <div className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
+                <div className="font-medium">{user?.name}</div>
+                <div className="text-xs text-slate-500">{user?.email}</div>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="px-4 py-3 rounded-md text-base font-medium transition-all flex items-center text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/10"
+              >
+                <LogOut className="h-4 w-4 mr-1.5" />
+                Log out
+              </button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/signin"
+                className="px-4 py-3 rounded-md text-base font-medium transition-all text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+              >
+                Sign In
+              </Link>
+              <Link
+                to="/signup"
+                className="px-4 py-3 rounded-md text-base font-medium transition-all bg-blue-600 text-white shadow-md hover:bg-blue-700"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </nav>
       </div>
     </header>
