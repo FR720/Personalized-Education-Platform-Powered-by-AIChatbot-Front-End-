@@ -11,13 +11,13 @@ interface MutationConfig<TData, TVariables>
     UseMutationOptions<TData, AxiosError, TVariables>,
     "mutationFn"
   > {
-  url: string;
+  getUrl: (variables: TVariables) => string; // بدل url الثابت
   method?: "POST" | "PUT" | "DELETE" | "PATCH";
   invalidateQueries?: string[];
 }
 
-export function useApiMutation<TData = unknown, TVariables = unknown>({
-  url,
+export function useApiMutation<TData = unknown, TVariables = any>({
+  getUrl,
   method = "POST",
   invalidateQueries = [],
   ...config
@@ -26,6 +26,7 @@ export function useApiMutation<TData = unknown, TVariables = unknown>({
 
   return useMutation<TData, AxiosError, TVariables>({
     mutationFn: async (variables) => {
+      const url = getUrl(variables); // استخدم المتغيرات لتوليد الـ URL
       const { data } = await axiosInstance({
         url,
         method,
@@ -34,7 +35,6 @@ export function useApiMutation<TData = unknown, TVariables = unknown>({
       return data;
     },
     onSuccess: (...args) => {
-      // Invalidate queries after successful mutation
       invalidateQueries.forEach((queryKey) => {
         queryClient.invalidateQueries({ queryKey: [queryKey] });
       });

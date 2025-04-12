@@ -29,6 +29,7 @@ import ContinueLearning from "@/pages/dashboard/_comp/ContinueLearning";
 import useUserStore from "@/store/authStore";
 
 import WeeklyActivity from "./_comp/WeeklyActivity";
+import { useApiQuery } from "@/hooks/useQuery";
 
 // Dummy course data
 const courses = [
@@ -96,7 +97,6 @@ const recommendations = [
 // Activity data for the chart
 
 const Dashboard = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<
     Array<{ sender: string; message: string }>
@@ -108,14 +108,10 @@ const Dashboard = () => {
     },
   ]);
   const [sendingMessage, setSendingMessage] = useState(false);
-
-  useEffect(() => {
-    // Simulate loading delay for animation
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+  const { data, isLoading } = useApiQuery({
+    url: "/courses",
+  });
+  console.log("🚀 ~ Dashboard ~ data:", data?.courses);
 
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,7 +149,7 @@ const Dashboard = () => {
         <div className="mb-8">
           <h1
             className={`text-3xl font-bold text-slate-900 dark:text-white mb-2 opacity-0 ${
-              isLoaded ? "animate-slide-down" : ""
+              isLoading ? "animate-slide-down" : ""
             }`}
             style={{ animationDelay: "100ms" }}
           >
@@ -161,7 +157,7 @@ const Dashboard = () => {
           </h1>
           <p
             className={`text-slate-600 dark:text-slate-400 opacity-0 ${
-              isLoaded ? "animate-slide-down" : ""
+              isLoading ? "animate-slide-down" : ""
             }`}
             style={{ animationDelay: "200ms" }}
           >
@@ -174,7 +170,7 @@ const Dashboard = () => {
             {/* Stats cards */}
             <div
               className={`grid grid-cols-1 md:grid-cols-3 gap-6 opacity-0 ${
-                isLoaded ? "animate-slide-up" : ""
+                isLoading ? "animate-slide-up" : ""
               }`}
               style={{ animationDelay: "300ms" }}
             >
@@ -225,11 +221,13 @@ const Dashboard = () => {
             </div>
 
             {/* Continue Learning */}
-            <ContinueLearning coursesList={courses} />
+            <ContinueLearning
+              coursesList={data?.courses.length ? data?.courses : courses}
+            />
 
             {/* Course Recommendations & Achievements */}
             <div
-              className={`opacity-0 ${isLoaded ? "animate-slide-up" : ""}`}
+              className={`opacity-0 ${isLoading ? "animate-slide-up" : ""}`}
               style={{ animationDelay: "500ms" }}
             >
               <Tabs defaultValue="recommendations" className="w-full">
@@ -241,48 +239,50 @@ const Dashboard = () => {
                 </TabsList>
 
                 <TabsContent value="recommendations" className="space-y-4">
-                  {recommendations.map((course) => (
-                    <Card key={course.id} className="overflow-hidden">
-                      <div className="flex flex-col md:flex-row">
-                        <div className="md:w-1/3 h-auto md:h-full bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
-                          <img
-                            src={course.image}
-                            alt={course.title}
-                            className="w-full h-40 md:h-full object-cover"
-                          />
-                        </div>
-
-                        <div className="p-5 md:w-2/3 flex flex-col">
-                          <div className="mb-2">
-                            <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs rounded-full">
-                              {course.category}
-                            </span>
+                  {(data?.courses.length ? data?.courses : recommendations).map(
+                    (course) => (
+                      <Card key={course.id} className="overflow-hidden">
+                        <div className="flex flex-col md:flex-row">
+                          <div className="md:w-1/3 h-auto md:h-full bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
+                            <img
+                              src={course.image}
+                              alt={course.title}
+                              className="w-full h-40 md:h-full object-cover"
+                            />
                           </div>
-                          <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                            {course.title}
-                          </h3>
-                          <p className="text-slate-600 dark:text-slate-400 text-sm flex-grow mb-4">
-                            {course.description}
-                          </p>
 
-                          <div className="flex items-center justify-between mt-auto">
-                            <Link to={`/course/${course.id}`}>
-                              <Button size="sm">
-                                <PlusCircle className="h-4 w-4 mr-2" /> Add
-                                Course
-                              </Button>
-                            </Link>
-                            <Link
-                              to={`/course/${course.id}`}
-                              className="text-blue-600 dark:text-blue-400 text-sm hover:underline"
-                            >
-                              Preview
-                            </Link>
+                          <div className="p-5 md:w-2/3 flex flex-col">
+                            <div className="mb-2">
+                              <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-xs rounded-full">
+                                {course.category}
+                              </span>
+                            </div>
+                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                              {course.title}
+                            </h3>
+                            <p className="text-slate-600 dark:text-slate-400 text-sm flex-grow mb-4">
+                              {course.description}
+                            </p>
+
+                            <div className="flex items-center justify-between mt-auto">
+                              <Link to={`/course/${course.id}`}>
+                                <Button size="sm">
+                                  <PlusCircle className="h-4 w-4 mr-2" /> Add
+                                  Course
+                                </Button>
+                              </Link>
+                              <Link
+                                to={`/course/${course.id}`}
+                                className="text-blue-600 dark:text-blue-400 text-sm hover:underline"
+                              >
+                                Preview
+                              </Link>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </Card>
-                  ))}
+                      </Card>
+                    )
+                  )}
 
                   <Link to="/courses" className="block text-center">
                     <Button variant="outline" className="mt-2">
@@ -369,7 +369,7 @@ const Dashboard = () => {
           {/* Right column - AI assistant and activity */}
           <div
             className={`space-y-6 opacity-0 ${
-              isLoaded ? "animate-slide-up" : ""
+              isLoading ? "animate-slide-up" : ""
             }`}
             style={{ animationDelay: "300ms" }}
           >

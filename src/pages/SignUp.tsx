@@ -30,7 +30,7 @@ const SignUp = () => {
   const navigate = useNavigate();
   const { setToken, setUser } = useUserStore();
   const createAccountMutation = useApiMutation({
-    url: "/auth/register",
+    getUrl: () => "/auth/register",
     method: "POST",
     invalidateQueries: ["SignUp"],
     onSuccess: (data: { token: string; user: any }) => {

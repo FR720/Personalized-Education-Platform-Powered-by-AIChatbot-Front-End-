@@ -24,10 +24,11 @@ import {
   Star,
   ChevronDown,
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import Navbar from "@/components/layout/Navbar";
-import PageTransition from "@/components/layout/PageTransition";
+
+import { toast } from "react-toastify";
 import withAuth from "@/lib/withAuth";
+import { useApiQuery } from "@/hooks/useQuery";
+import { useApiMutation } from "@/hooks/useMutuation";
 
 // Dummy course data
 const allCourses = [
@@ -153,26 +154,30 @@ const Courses = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All Categories");
   const [selectedLevel, setSelectedLevel] = useState("All Levels");
-  const [isLoaded, setIsLoaded] = useState(false);
-  const { toast } = useToast();
 
-  useEffect(() => {
-    // Simulate loading delay for animation
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
+  const { data, isLoading } = useApiQuery({
+    url: "/courses",
+  });
+
+  const { mutate, isPending } = useApiMutation({
+    getUrl: ({ courseId }) => `/courses/${courseId}/enroll`,
+    method: "POST",
+    invalidateQueries: ["enrollment"],
+    onSuccess: () => {
+      toast.success("Enrolled successfully!");
+    },
+    onError: () => {
+      toast.error("Error happened");
+    },
+  });
 
   const handleEnroll = (courseId: number, courseTitle: string) => {
-    console.log(`Enrolling in course: ${courseId}`);
-    toast({
-      title: "Enrolled Successfully",
-      description: `You've been enrolled in "${courseTitle}"`,
-    });
+    mutate({ courseId });
   };
 
-  const filteredCourses = allCourses.filter((course) => {
+  const filteredCourses = (
+    data?.courses.length ? data?.courses : allCourses
+  ).filter((course) => {
     const matchesSearch =
       course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       course.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -185,8 +190,12 @@ const Courses = () => {
     return matchesSearch && matchesCategory && matchesLevel;
   });
 
-  const enrolledCourses = filteredCourses.filter((course) => course.enrolled);
-  const availableCourses = filteredCourses.filter((course) => !course.enrolled);
+  const enrolledCourses = data?.courses.length
+    ? data?.courses
+    : filteredCourses.filter((course) => course.enrolled);
+  const availableCourses = data?.courses.length
+    ? data?.courses
+    : filteredCourses.filter((course) => !course.enrolled);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-20 pb-12 px-4 sm:px-6">
@@ -195,7 +204,7 @@ const Courses = () => {
         <div className="mb-8">
           <h1
             className={`text-3xl font-bold text-slate-900 dark:text-white mb-2 opacity-0 ${
-              isLoaded ? "animate-slide-down" : ""
+              !isLoading ? "animate-slide-down" : ""
             }`}
             style={{ animationDelay: "100ms" }}
           >
@@ -203,7 +212,7 @@ const Courses = () => {
           </h1>
           <p
             className={`text-slate-600 dark:text-slate-400 opacity-0 ${
-              isLoaded ? "animate-slide-down" : ""
+              !isLoading ? "animate-slide-down" : ""
             }`}
             style={{ animationDelay: "200ms" }}
           >
@@ -213,7 +222,7 @@ const Courses = () => {
 
         {/* Search and filters */}
         <div
-          className={`mb-8 opacity-0 ${isLoaded ? "animate-slide-up" : ""}`}
+          className={`mb-8 opacity-0 ${!isLoading ? "animate-slide-up" : ""}`}
           style={{ animationDelay: "300ms" }}
         >
           <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm p-4 border border-slate-200 dark:border-slate-800">
@@ -279,7 +288,7 @@ const Courses = () => {
 
         {/* Course listings */}
         <div
-          className={`opacity-0 ${isLoaded ? "animate-slide-up" : ""}`}
+          className={`opacity-0 ${!isLoading ? "animate-slide-up" : ""}`}
           style={{ animationDelay: "400ms" }}
         >
           <Tabs defaultValue="all" className="w-full">
@@ -304,6 +313,7 @@ const Courses = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {filteredCourses.map((course) => (
                     <CourseCard
+                      isPending={isPending}
                       key={course.id}
                       course={course}
                       onEnroll={handleEnroll}
@@ -328,6 +338,7 @@ const Courses = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {enrolledCourses.map((course) => (
                     <CourseCard
+                      isPending={isPending}
                       key={course.id}
                       course={course}
                       onEnroll={handleEnroll}
@@ -352,6 +363,7 @@ const Courses = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {availableCourses.map((course) => (
                     <CourseCard
+                      isPending={isPending}
                       key={course.id}
                       course={course}
                       onEnroll={handleEnroll}
@@ -381,10 +393,15 @@ interface CourseCardProps {
     rating: number;
     image: string;
   };
+  isPending?: boolean;
   onEnroll: (courseId: number, courseTitle: string) => void;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, onEnroll }) => {
+const CourseCard: React.FC<CourseCardProps> = ({
+  course,
+  onEnroll,
+  isPending,
+}) => {
   return (
     <Card className="overflow-hidden h-full flex flex-col group transition-all duration-300 hover:shadow-glossy border border-slate-200 dark:border-slate-800">
       <div className="aspect-[16/9] bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
@@ -470,6 +487,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, onEnroll }) => {
           </Link>
         ) : (
           <Button
+            disabled={isPending}
             className="w-full shadow-sm"
             onClick={() => onEnroll(course.id, course.title)}
           >

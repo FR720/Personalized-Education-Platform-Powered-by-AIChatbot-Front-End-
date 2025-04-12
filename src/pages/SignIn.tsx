@@ -29,27 +29,27 @@ const SignIn = () => {
   const navigate = useNavigate();
 
   const { setToken, setUser } = useUserStore();
-  const createAccountMutation = useApiMutation({
-    url: "/auth/login",
+  const { mutate, isPending: loading } = useApiMutation({
+    getUrl: () => "/auth/login",
     method: "POST",
     invalidateQueries: ["login"],
     onSuccess: (data: { token: string; user: any }) => {
       console.log("🚀 ~ login ~ data:", data);
       setToken(data.token);
       setUser(data.user);
-      toast.success("Logged In successfully!");
+      toast.success("Logged in successfully!");
       navigate("/dashboard");
     },
     onError: (error) => {
-      // toast.error(error.message);
+      //@ts-ignore
+      toast.error(error?.response?.data?.message || "Login failed");
     },
   });
-  const { mutate, isPending: loading } = createAccountMutation;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     mutate({
-      name,
       email,
       password,
     });
