@@ -24,6 +24,8 @@ import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/layout/Navbar";
 import PageTransition from "@/components/layout/PageTransition";
 import withAuth from "@/lib/withAuth";
+import { useApiQuery } from "@/hooks/useQuery";
+import ChatAI from "@/components/ChatAI";
 
 // Dummy course data
 const courseData = {
@@ -220,45 +222,46 @@ const courseData = {
 };
 
 // Calculate completed modules
-const totalModules = courseData.sections.reduce(
-  (acc, section) => acc + section.modules.length,
-  0
-);
-const completedModules = courseData.sections.reduce((acc, section) => {
-  const completedInSection = section.modules.filter(
-    (module) => module.completed
-  ).length;
-  return acc + completedInSection;
-}, 0);
 
 const CourseView = () => {
   const { courseId } = useParams();
-  const [isLoaded, setIsLoaded] = useState(false);
+  console.log("🚀 ~ CourseView ~ courseId:", courseId);
+
+  const {
+    data,
+    isLoading: isLoaded,
+    error,
+  } = useApiQuery({
+    url: `/courses/${courseId}`,
+  });
+  const totalModules = (
+    data?.course?.sections?.length
+      ? data?.course?.sections
+      : courseData.sections
+  ).reduce((acc, section) => acc + section.modules.length, 0);
+  const completedModules = (
+    data?.course?.sections?.length
+      ? data?.course?.sections
+      : courseData.sections
+  ).reduce((acc, section) => {
+    const completedInSection = section.modules.filter(
+      (module) => module.completed
+    ).length;
+    return acc + completedInSection;
+  }, 0);
+  console.log("🚀 ~ CourseView ~ data:", data);
+
   const [activeModule, setActiveModule] = useState(
-    courseData.sections[2].modules[0]
+    (data?.course?.sections?.length
+      ? data?.course?.sections
+      : courseData.sections)[2].modules[0]
   );
   const [videoPlaying, setVideoPlaying] = useState(false);
-  const [chatMessage, setChatMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState<
-    Array<{ sender: string; message: string }>
-  >([
-    {
-      sender: "ai",
-      message: "Hello! I'm your course assistant. Need help with any concepts?",
-    },
-  ]);
+
   const [sendingMessage, setSendingMessage] = useState(false);
   const { toast } = useToast();
 
   const videoRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    // Simulate loading delay for animation
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 100);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleModuleSelect = (module: any) => {
     setActiveModule(module);
@@ -285,35 +288,6 @@ const CourseView = () => {
       title: "Progress Updated",
       description: `${activeModule.title} marked as complete`,
     });
-  };
-
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatMessage.trim()) return;
-
-    // Add user message to chat
-    setChatHistory([...chatHistory, { sender: "user", message: chatMessage }]);
-    setSendingMessage(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponses = [
-        "In unsupervised learning, the algorithm identifies patterns without labeled data. Clustering is one common technique.",
-        "Neural networks are inspired by the human brain's structure. They consist of layers of interconnected nodes or 'neurons'.",
-        "K-means is a popular clustering algorithm that partitions data into K distinct clusters based on distance measures.",
-        "Dimensionality reduction techniques like PCA help visualize high-dimensional data and can improve model performance.",
-        "Ethics in machine learning involves addressing bias, ensuring transparency, and considering the societal impact of AI systems.",
-      ];
-
-      const randomResponse =
-        aiResponses[Math.floor(Math.random() * aiResponses.length)];
-      setChatHistory((prev) => [
-        ...prev,
-        { sender: "ai", message: randomResponse },
-      ]);
-      setChatMessage("");
-      setSendingMessage(false);
-    }, 1500);
   };
 
   return (
@@ -366,8 +340,8 @@ const CourseView = () => {
             {/* Video player */}
             <div
               ref={videoRef}
-              className={`bg-slate-900 rounded-xl overflow-hidden aspect-video relative group opacity-0 ${
-                isLoaded ? "animate-fade-in" : ""
+              className={`bg-slate-900 rounded-xl overflow-hidden aspect-video relative group ${
+                !isLoaded ? "animate-fade-in" : ""
               }`}
               style={{ animationDelay: "200ms" }}
             >
@@ -440,10 +414,7 @@ const CourseView = () => {
             </div>
 
             {/* Tabs for content, discussion, etc. */}
-            <div
-              className={`opacity-0 ${isLoaded ? "animate-fade-in" : ""}`}
-              style={{ animationDelay: "300ms" }}
-            >
+            <div className={` `}>
               <Tabs defaultValue="content" className="w-full">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="content">Course Content</TabsTrigger>
@@ -660,10 +631,7 @@ const CourseView = () => {
           {/* Sidebar - course info and AI assistant */}
           <div className="space-y-6">
             {/* Course info */}
-            <Card
-              className={`opacity-0 ${isLoaded ? "animate-fade-in" : ""}`}
-              style={{ animationDelay: "400ms" }}
-            >
+            <Card className={``} style={{ animationDelay: "400ms" }}>
               <CardContent className="pt-6">
                 <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">
                   Course Overview
@@ -725,86 +693,7 @@ const CourseView = () => {
             </Card>
 
             {/* AI Learning Assistant */}
-            <Card
-              className={`overflow-hidden h-[400px] flex flex-col opacity-0 ${
-                isLoaded ? "animate-fade-in" : ""
-              }`}
-              style={{ animationDelay: "500ms" }}
-            >
-              <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-4">
-                <div className="flex items-center">
-                  <div className="mr-3 h-9 w-9 rounded-full bg-white/20 flex items-center justify-center">
-                    <MessageCircle className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold">Course Assistant</h3>
-                    <p className="text-xs text-blue-100">
-                      Ask questions about course material
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex-grow overflow-y-auto p-4">
-                <div className="space-y-4">
-                  {chatHistory.map((chat, index) => (
-                    <div
-                      key={index}
-                      className={`flex ${
-                        chat.sender === "user" ? "justify-end" : "justify-start"
-                      }`}
-                    >
-                      <div
-                        className={`max-w-[85%] rounded-lg p-3 ${
-                          chat.sender === "user"
-                            ? "bg-blue-600 text-white rounded-tr-none"
-                            : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-tl-none"
-                        }`}
-                      >
-                        {chat.message}
-                      </div>
-                    </div>
-                  ))}
-                  {sendingMessage && (
-                    <div className="flex justify-start">
-                      <div className="max-w-[85%] rounded-lg p-3 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-tl-none">
-                        <div className="flex space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 animate-pulse"></div>
-                          <div
-                            className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 animate-pulse"
-                            style={{ animationDelay: "0.2s" }}
-                          ></div>
-                          <div
-                            className="w-2 h-2 rounded-full bg-slate-300 dark:bg-slate-600 animate-pulse"
-                            style={{ animationDelay: "0.4s" }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="p-4 border-t border-slate-200 dark:border-slate-800">
-                <form onSubmit={handleSendMessage} className="flex space-x-2">
-                  <input
-                    type="text"
-                    value={chatMessage}
-                    onChange={(e) => setChatMessage(e.target.value)}
-                    disabled={sendingMessage}
-                    placeholder="Ask about this course..."
-                    className="flex-grow text-sm px-3 py-1.5 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                  <Button
-                    type="submit"
-                    size="sm"
-                    disabled={!chatMessage.trim() || sendingMessage}
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                </form>
-              </div>
-            </Card>
+            <ChatAI courseId={courseId} />
           </div>
         </div>
       </div>
