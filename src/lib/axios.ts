@@ -1,7 +1,7 @@
 import axios, { AxiosError } from "axios";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
-const baseURL = import.meta.env.VITE_API_URL || "BASE_URL";
+const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export const axiosInstance = axios.create({
   baseURL,
@@ -13,9 +13,12 @@ export const axiosInstance = axios.create({
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const token = localStorage.getItem("user-storage");
+    const parsedStorage = JSON.parse(token || "{}");
+    const actualToken = parsedStorage.state?.token;
+    console.log("🚀 ~ actualToken:", actualToken);
+    if (actualToken) {
+      config.headers.Authorization = `Bearer ${actualToken}`;
     }
     return config;
   },
@@ -31,9 +34,10 @@ axiosInstance.interceptors.response.use(
 
     switch (statusCode) {
       case 401:
-        // Handle unauthorized
-        localStorage.removeItem("token");
-        window.location.href = "/login";
+        toast.error("Unauthorized access. Please log in again.");
+
+        localStorage.removeItem("user-storage");
+        window.location.href = "/signin";
         break;
       case 403:
         toast.error("Permission denied");
