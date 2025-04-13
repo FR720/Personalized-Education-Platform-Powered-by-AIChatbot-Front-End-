@@ -97,50 +97,11 @@ const recommendations = [
 // Activity data for the chart
 
 const Dashboard = () => {
-  const [chatMessage, setChatMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState<
-    Array<{ sender: string; message: string }>
-  >([
-    {
-      sender: "ai",
-      message:
-        "Hello! I'm your AI learning assistant. How can I help you with your courses today?",
-    },
-  ]);
-  const [sendingMessage, setSendingMessage] = useState(false);
   const { data, isLoading } = useApiQuery({
     url: "/courses",
   });
   console.log("🚀 ~ Dashboard ~ data:", data?.courses);
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!chatMessage.trim()) return;
-
-    // Add user message to chat
-    setChatHistory([...chatHistory, { sender: "user", message: chatMessage }]);
-    setSendingMessage(true);
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiResponses = [
-        "Based on your progress in Machine Learning, I'd recommend focusing on the neural networks module next.",
-        "Great question! For web development, I suggest practicing with small projects to solidify your JavaScript skills.",
-        "Looking at your learning patterns, you seem to excel at visual content. Have you considered the UX/UI design course?",
-        "To improve in data structures, try solving the practice problems in the algorithm complexity section.",
-        "Your consistent study habits are impressive! Keep up the good work on your current courses.",
-      ];
-
-      const randomResponse =
-        aiResponses[Math.floor(Math.random() * aiResponses.length)];
-      setChatHistory((prev) => [
-        ...prev,
-        { sender: "ai", message: randomResponse },
-      ]);
-      setChatMessage("");
-      setSendingMessage(false);
-    }, 1500);
-  };
   const { user } = useUserStore();
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 pt-20 pb-12 px-4 sm:px-6">
@@ -148,16 +109,16 @@ const Dashboard = () => {
         {/* Welcome section */}
         <div className="mb-8">
           <h1
-            className={`text-3xl font-bold text-slate-900 dark:text-white mb-2 opacity-0 ${
-              isLoading ? "animate-slide-down" : ""
+            className={`text-3xl font-bold text-slate-900 dark:text-white mb-2 ${
+              !isLoading ? "animate-slide-down" : ""
             }`}
             style={{ animationDelay: "100ms" }}
           >
             Welcome back, {user?.name || "User"} !
           </h1>
           <p
-            className={`text-slate-600 dark:text-slate-400 opacity-0 ${
-              isLoading ? "animate-slide-down" : ""
+            className={`text-slate-600 dark:text-slate-400 ${
+              !isLoading ? "animate-slide-down" : ""
             }`}
             style={{ animationDelay: "200ms" }}
           >
@@ -169,8 +130,8 @@ const Dashboard = () => {
           <div className="lg:col-span-2 space-y-6">
             {/* Stats cards */}
             <div
-              className={`grid grid-cols-1 md:grid-cols-3 gap-6 opacity-0 ${
-                isLoading ? "animate-slide-up" : ""
+              className={`grid grid-cols-1 md:grid-cols-3 gap-6 ${
+                !isLoading ? "animate-slide-up" : ""
               }`}
               style={{ animationDelay: "300ms" }}
             >
@@ -227,7 +188,7 @@ const Dashboard = () => {
 
             {/* Course Recommendations & Achievements */}
             <div
-              className={`opacity-0 ${isLoading ? "animate-slide-up" : ""}`}
+              className={`${!isLoading ? "animate-slide-up" : ""}`}
               style={{ animationDelay: "500ms" }}
             >
               <Tabs defaultValue="recommendations" className="w-full">
@@ -368,13 +329,11 @@ const Dashboard = () => {
 
           {/* Right column - AI assistant and activity */}
           <div
-            className={`space-y-6 opacity-0 ${
-              isLoading ? "animate-slide-up" : ""
-            }`}
+            className={`space-y-6 ${!isLoading ? "animate-slide-up" : ""}`}
             style={{ animationDelay: "300ms" }}
           >
             {/* AI Learning Assistant */}
-            <Card className="overflow-hidden h-[500px] flex flex-col">
+            {/* <Card className="overflow-hidden h-[500px] flex flex-col">
               <CardHeader className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white pb-4">
                 <div className="flex items-center">
                   <div className="mr-3 h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
@@ -451,7 +410,7 @@ const Dashboard = () => {
                   </Button>
                 </form>
               </CardFooter>
-            </Card>
+            </Card> */}
 
             {/* Weekly activity */}
             <WeeklyActivity />
