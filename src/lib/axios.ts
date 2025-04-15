@@ -1,7 +1,9 @@
 import axios, { AxiosError } from "axios";
 import { toast } from "react-toastify";
 
-const baseURL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+const baseURL =
+  import.meta.env.VITE_API_URL ||
+  "https://magic-korrie-myorgnazation-0c29b824.koyeb.app/";
 
 export const axiosInstance = axios.create({
   baseURL,
